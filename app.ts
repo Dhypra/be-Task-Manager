@@ -54,7 +54,7 @@ export { io };
 const PORT = Number(process.env.PORT || 5000);
 const NODE_ENV = process.env.NODE_ENV || "development";
 
-server.listen(PORT, () => {
+server.listen(PORT, "0.0.0.0", () => {
   logger.info("Server started successfully", {
     port: PORT,
     environment: NODE_ENV,

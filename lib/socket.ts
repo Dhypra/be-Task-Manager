@@ -14,11 +14,10 @@ export const initializeSocket = (server: http.Server) => {
   const corsOrigins = (process.env.SOCKET_IO_CORS || process.env.CORS_ORIGIN || "*").split(",");
   
   io = new Server(server, {
-    cors: {
-      origin: corsOrigins,
-      credentials: true,
-      methods: ["GET", "POST"],
-    },
+  cors: {
+    origin: "*",
+  },
+    
   });
 
   // Socket.IO middleware untuk autentikasi JWT
