@@ -10,6 +10,9 @@
     "build": "tsc",
     "start": "tsx app.ts"
   },
+  "engines": {
+    "node": "24.0"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
