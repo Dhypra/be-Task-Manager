@@ -5,7 +5,7 @@
 
 import type { Request, Response } from "express";
 import { Prisma } from "../generated/prisma/client";
-import type { Status } from "../generated/prisma/enums";
+import { Status } from "@prisma/client";
 import { prisma } from "../lib/prisma";
 import { io } from "../lib/socket";
 
@@ -27,7 +27,11 @@ const parseInteger = (value: unknown, fallback: number): number => {
 
 const parseStatus = (value: unknown): Status | undefined => {
   const candidate = String(value ?? "").trim();
-  if (candidate === "ON_SCHEDULE" || candidate === "COMPLETED" || candidate === "OVERDUE") {
+  if (
+    candidate === "ON_SCHEDULE" ||
+    candidate === "COMPLETED" ||
+    candidate === "OVERDUE"
+  ) {
     return candidate as Status;
   }
   return undefined;
@@ -46,7 +50,7 @@ const errorResponse = (
   res: Response,
   error: unknown,
   message = "Server error",
-  status = 500
+  status = 500,
 ): Response => {
   return res.status(status).json({
     message: error instanceof Error ? error.message : message,
@@ -56,7 +60,7 @@ const errorResponse = (
 const buildTaskFilter = (
   user: AuthRequest["user"],
   search: unknown,
-  status: unknown
+  status: unknown,
 ): Prisma.TaskWhereInput => {
   const queryStatus = parseStatus(status);
   const baseFilter: Prisma.TaskWhereInput = {
@@ -67,10 +71,15 @@ const buildTaskFilter = (
     ...(queryStatus ? { status: queryStatus } : {}),
   };
 
-  return user.role === "ADMIN" ? baseFilter : { ...baseFilter, userId: user.userId };
+  return user.role === "ADMIN"
+    ? baseFilter
+    : { ...baseFilter, userId: user.userId };
 };
 
-export const getUsers = async (req: AuthRequest, res: Response): Promise<Response> => {
+export const getUsers = async (
+  req: AuthRequest,
+  res: Response,
+): Promise<Response> => {
   try {
     const users = await prisma.user.findMany({
       select: {
@@ -88,7 +97,10 @@ export const getUsers = async (req: AuthRequest, res: Response): Promise<Respons
   }
 };
 
-export const getAllTasks = async (req: AuthRequest, res: Response): Promise<Response> => {
+export const getAllTasks = async (
+  req: AuthRequest,
+  res: Response,
+): Promise<Response> => {
   try {
     const tasks = await prisma.task.findMany();
     return res.status(200).json(tasks);
@@ -97,7 +109,10 @@ export const getAllTasks = async (req: AuthRequest, res: Response): Promise<Resp
   }
 };
 
-export const getStats = async (req: AuthRequest, res: Response): Promise<Response> => {
+export const getStats = async (
+  req: AuthRequest,
+  res: Response,
+): Promise<Response> => {
   try {
     const { role, userId } = req.user;
     const where: Prisma.TaskWhereInput = role === "ADMIN" ? {} : { userId };
@@ -116,8 +131,16 @@ export const getStats = async (req: AuthRequest, res: Response): Promise<Respons
   }
 };
 
-export const getTasks = async (req: AuthRequest, res: Response): Promise<Response> => {
-  const { search = "", page = "1", limit = "6", status } = req.query as {
+export const getTasks = async (
+  req: AuthRequest,
+  res: Response,
+): Promise<Response> => {
+  const {
+    search = "",
+    page = "1",
+    limit = "6",
+    status,
+  } = req.query as {
     search?: string;
     page?: string;
     limit?: string;
@@ -153,7 +176,10 @@ export const getTasks = async (req: AuthRequest, res: Response): Promise<Respons
   }
 };
 
-export const getDetailTask = async (req: AuthRequest, res: Response): Promise<Response> => {
+export const getDetailTask = async (
+  req: AuthRequest,
+  res: Response,
+): Promise<Response> => {
   try {
     const { id } = req.params;
     const task = await prisma.task.findUnique({ where: { id } });
@@ -172,12 +198,17 @@ export const getDetailTask = async (req: AuthRequest, res: Response): Promise<Re
   }
 };
 
-export const createTask = async (req: AuthRequest, res: Response): Promise<Response> => {
+export const createTask = async (
+  req: AuthRequest,
+  res: Response,
+): Promise<Response> => {
   try {
     const { title, description, deadline, status } = req.body;
 
     if (!title || !description || deadline === undefined || deadline === null) {
-      return res.status(400).json({ message: "Title, description, and deadline are required" });
+      return res
+        .status(400)
+        .json({ message: "Title, description, and deadline are required" });
     }
 
     const parsedDeadline = parseDeadline(deadline);
@@ -194,15 +225,18 @@ export const createTask = async (req: AuthRequest, res: Response): Promise<Respo
         user: { connect: { id: req.user.userId } },
       },
     });
-  
-    io.emit("task:created",task);
+
+    io.emit("task:created", task);
     return res.status(201).json(task);
   } catch (error) {
     return errorResponse(res, error, "Error creating task");
   }
 };
 
-export const updateTask = async (req: AuthRequest, res: Response): Promise<Response> => {
+export const updateTask = async (
+  req: AuthRequest,
+  res: Response,
+): Promise<Response> => {
   try {
     const { id } = req.params;
     const { title, description, deadline, status } = req.body;
@@ -213,7 +247,9 @@ export const updateTask = async (req: AuthRequest, res: Response): Promise<Respo
     }
 
     if (req.user.role !== "ADMIN" && task.userId !== req.user.userId) {
-      return res.status(403).json({ message: "Forbidden: You can only update your own tasks" });
+      return res
+        .status(403)
+        .json({ message: "Forbidden: You can only update your own tasks" });
     }
 
     const updates: Prisma.TaskUpdateInput = {};
@@ -240,7 +276,10 @@ export const updateTask = async (req: AuthRequest, res: Response): Promise<Respo
       return res.status(400).json({ message: "No fields provided for update" });
     }
 
-    const updatedTask = await prisma.task.update({ where: { id }, data: updates });
+    const updatedTask = await prisma.task.update({
+      where: { id },
+      data: updates,
+    });
     io.emit("task:updated", updatedTask);
     return res.status(200).json(updatedTask);
   } catch (error) {
@@ -248,7 +287,10 @@ export const updateTask = async (req: AuthRequest, res: Response): Promise<Respo
   }
 };
 
-export const deleteTask = async (req: AuthRequest, res: Response): Promise<Response> => {
+export const deleteTask = async (
+  req: AuthRequest,
+  res: Response,
+): Promise<Response> => {
   try {
     const { id } = req.params;
 
@@ -258,7 +300,9 @@ export const deleteTask = async (req: AuthRequest, res: Response): Promise<Respo
     }
 
     if (req.user.role !== "ADMIN" && task.userId !== req.user.userId) {
-      return res.status(403).json({ message: "Forbidden: You can only delete your own tasks" });
+      return res
+        .status(403)
+        .json({ message: "Forbidden: You can only delete your own tasks" });
     }
 
     await prisma.task.delete({ where: { id } });
