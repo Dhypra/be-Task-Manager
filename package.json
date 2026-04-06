@@ -4,11 +4,11 @@
   "description": "",
   "main": "index.js",
   "type": "module",
-"scripts": {
-  "dev": "tsx app.ts",
-  "build": "tsc",
-  "start": "node dist/app.js"
-},
+  "scripts": {
+    "dev": "tsx app.ts",
+    "build": "tsc",
+    "start": "node dist/app.js"
+  },
   "engines": {
     "node": ">=20"
   },
