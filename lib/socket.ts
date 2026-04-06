@@ -1,7 +1,7 @@
 import { Server } from "socket.io";
 import http from "http";
 import jwt from "jsonwebtoken";
-import { logger } from "./logger";
+import { logger } from "./logger.js";
 
 let io: Server;
 

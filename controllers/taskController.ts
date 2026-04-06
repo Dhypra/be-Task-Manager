@@ -6,8 +6,8 @@
 import type { Request, Response } from "express";
 import { Prisma } from "@prisma/client";
 import { Status } from "@prisma/client";
-import { prisma } from "../lib/prisma";
-import { io } from "../lib/socket";
+import { prisma } from "../lib/prisma.js";
+import { io } from "../lib/socket.js";
 
 type AuthRequest = Request & {
   user: {

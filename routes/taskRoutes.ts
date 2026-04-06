@@ -14,9 +14,9 @@ import {
   updateTask,
   deleteTask,
   getDetailTask,
-} from "../controllers/taskController";
-import { exportTasksPDF } from "../controllers/pdfController";
-import { isAdmin, verifyToken } from "../middleware/authMiddleware";
+} from "../controllers/taskController.js";
+import { exportTasksPDF } from "../controllers/pdfController.js";
+import { isAdmin, verifyToken } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 

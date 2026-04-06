@@ -5,7 +5,7 @@
 
 import PDFDocument from "pdfkit";
 import type { Response } from "express";
-import { prisma } from "../lib/prisma";
+import { prisma } from "../lib/prisma.js";
 
 type AuthRequest = {
   user: {

@@ -6,13 +6,13 @@
 import express, { type Request, type Response } from "express";
 import cors from "cors";
 import http from "http";
-import { validateEnv } from "./lib/env";
-import { logger } from "./lib/logger";
-import { initializeSocket } from "./lib/socket";
-import { rateLimitMiddleware } from "./middleware/rateLimitMiddleware";
-import { prisma } from "./lib/prisma";
-import router from "./routes/taskRoutes";
-import authRoutes from "./routes/authRoutes";
+import { validateEnv } from "./lib/env.js";
+import { logger } from "./lib/logger.js";
+import { initializeSocket } from "./lib/socket.js";
+import { rateLimitMiddleware } from "./middleware/rateLimitMiddleware.js";
+import { prisma } from "./lib/prisma.js";
+import router from "./routes/taskRoutes.js";
+import authRoutes from "./routes/authRoutes.js";
 
 // Validate environment variables at startup
 validateEnv();
