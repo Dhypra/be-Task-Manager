@@ -54,6 +54,10 @@ export { io };
 const PORT = Number(process.env.PORT || 5000);
 const NODE_ENV = process.env.NODE_ENV || "development";
 
+app.get("/", (req, res) => {
+  res.send("API is running 🚀");
+});
+
 server.listen(PORT, "0.0.0.0", () => {
   logger.info("Server started successfully", {
     port: PORT,
